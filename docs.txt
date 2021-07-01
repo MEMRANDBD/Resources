@@ -1,0 +1,204 @@
+* What is Framework
+-> A framework is a set of conceptual structure and guidelines, used to build something useful.
+
+A framework may include predefined classes and functions that can be used to process input, manage hardware devices, and interact with system software.
+
+The purpose of the framework is to allow developers to focus on building a unique feature for their project rather than writing code from scratch.
+
+* Why use Framework
+->      1. Collection of tools
+	2. No need to start from scratch
+	3. Save time
+	4. Improve productivity
+	5. Clean code
+	6. Reusable code
+	7. Testing
+	8. Debugging
+
+* Web Framework
+-> Web framework helps to build web applications
+
+Web frameworks provide tools and libraries to simplify common web development operations. This can include web servies, APIs and other resources.
+
+Web frameworks help with a variety of tasks, from templating and database access to session management and code reuse
+
+More than 80% of all web app frameworks rely on the Model View Controller architecture
+
+* Model View Template(MVT)
+-> MVT is an design pattern that seperates an application into three main logical components Model, View and Template
+
+MODEL responsible to handle database. It is a data access layer which handles the data
+
+User can send request by interacting with TEMPLATE, the VIEW handles these requests and sends to MODEL then get appropriate response from the MODEL, sends response to TEMPLATE. VIEW may also have required logics. And it works as a mediator between TEMPLATE and MODEL.
+
+TEMPLATE represent how data should be presented to the application user. User can read or write the data from TEMPLATE. Basically it is responsible for showing end user content, we can say it is user interface. It may consists of HTML, CSS and JavaScript mixed with Django Template language(Jinja2)
+
+* Why use MVT
+->      1. Organized code
+	2. Independent block
+	3. Reduces the complexity of web applications
+	4. Easy to maintain
+	5. Easy to modify
+
+* Environment setup and good practices
+->      1. Install python if not in your machine. (One time). You can download official python or Anaconda.
+	2. Create a project folder.
+		$ mkdir <Project Name>
+	3. Go to your project folder.
+		$ cd <Project Name>
+	4. Create a virtual environment to avoid unwanted circumstances. (Once for each project)
+		$ python -m venv <Virtual Environment Name>
+	5. Activate your virtual environment. (Everytime you want to work on your project)
+		$ source <Virtual Environment Name>/bin/activate
+		or in windows > <Virtual Enviroment Name>\Scripts\activate
+	6. Install django. (Once for each virtual environment)
+		$ pip install django
+	7. Create core django functionality of your project.
+		$ django-admin startproject core .
+	8. Create an application for your project.
+		$ python manage.py startapp <App Name>
+
+		project structure:
+			<Project Name>
+			    |-- core
+			    |   |-- __pycache__
+			    |   |-- __init__.py
+			    |   |-- asgi.py
+			    |   |-- settings.py
+			    |   |-- urls.py
+			    |   |-- wsgi.py
+			    |-- <App Name>
+			    |   |-- migrations
+			    |   |-- __init__.py
+			    |   |-- admin.py
+			    |   |-- apps.py
+			    |   |-- models.py
+			    |   |-- tests.py
+			    |   |-- views.py
+			    |-- <Virtual Environment Name>
+			    |-- manage.py
+	9. Install the app in your core/settings.py file
+		INSTALLED_APPS = [
+			...,
+			...,
+			<App Name>.apps.<App Name>Config, # Second <App Name>'s first letter capitalized
+			# Or simply
+			<App Name>,
+		]
+	10. Run your project development server.
+		$ python manage.py runserver
+	11. Deactivate your virtual environment after finishing work.
+		$ deactivate
+
+* Create Function based view. (Act as Controller of MVC)
+-> Function based view is a python function that takes a web request(HttpRequest) and return a web response(HttpResponse)
+
+This response can be the HTML contents of a web page or redirect or a 404 error or an XML document or an image or anything.(HttpResponse Object)
+
+Each view function takes an HttpRequest object as its first parameter.
+
+The view returns an HttpResponse object that contains the generated response. Each view function is responsible for returning an HttpResponse object
+
+We will call these function as view function or view function of application or simply view
+
+Views are defined in views.py file which may contain business logic of the application like this
+
+	from django.http import HttpResponse
+	def function_name(<HttpRequest Object Name>):
+		# process logic and data, and bind with HttpResponse Object
+		return HttpResponse(<HttpResponse Object>)
+
+* URL-conf: URL dispatcher or URL pattern
+-> To design URLs for app, create a python module informally named urls.py. This module is pure python code and is a mapping between URL path expressions to view functions.
+
+This mapping can be as short or as long as needed.
+
+It can reference other mappings.
+
+It's pure python code so it can be constructed dynamically.
+
+* URL pattern inside project vs URL pattern inside app
+-> Creating a urls.py file for every App gives us Plug&Play feature to reuse our App for other project.
+URL pattern inside project increases the dependency of applications in project which means if we want to use a particular application for our another project we may face issues.
+Our each application should be independent or less depend on project so we could use our applications in different projects easily without worrying about urls.py available in project folder.
+Following are the benefits of defining url pattern inside application
+	1. Reduces the dependency of application
+	2. Enhance application performance
+	3. Reusability of application becomes easy
+
+Basic syntax of urls.py file
+	from django.urls import path
+	from <App Name> inport views
+	urlpatterns = [
+		path(route, view, kwargs, name),
+	]
+
+django.urls.path -> it returns an element for inclusion in urlpatterns
+route -> This argument should be a string or gettext_lazy() that contains a URL pattern. The string may contain angle brackets e.g. <KeywordName> to capture part of the URL and send it as a keyword a argument to the view. The angle brackets may include a converter specification like the int(integer) part of <int:id> which limits the characters matched and may also change the type of the variable passed to the view. For example, <int:id> matches a string of decimal number and converts the value to an int.
+view -> This argument is a view function(views.<function_name>) or the result of as_view() for class-based views. It can also be an django.urls.include().
+kwargs -> This argument allows to pass additional arguments to the view function. It should be a dictionary.
+name -> This argument is used to perform URL reversing.
+
+django.urls.include -> Used to include URLconf module(urls.py) of an application to the project URLconf module(urls.py). It also accepts as an argument either an iterable that return URL patterns or a 2-tuple containing such iterable plus the names of the application namespaces.
+
+Basic configurations of core.urls
+		from django.urls import include, path
+		urlpatterns = [
+			path('<App Name>/', include('<App Name>.urls'), namespace),
+			# OR can be include list of paths
+			path('<category>/', include(<list of paths>)),
+			# OR also include list of paths with namespace
+			path('<category>/', include(<list of paths>, app_namespace), namespace),
+		]
+		where,
+			module -> URLconf module(urls.py)
+			namespaces(str) -> Instance namespace for the URL entries being included
+			<list of paths> -> Iterable of path() and/or re_path() instances
+			app_namespaces(str) -> Application namespace for the URL entries being included
+
+By default there is no urls.py file inside application, to do so
+	$ touch <App Name>/urls.py
+
+* Rendering TEMPLATE file
+-> A template is a text file. It can be generated to any text-based format(HTML, XML, CSV etc).
+A template contains variables, which get replaced with values when the template is evaluated, and tags which control the logic of the template.
+Template is used by view function to represent the data to user.
+User sends request to view then view contact template afterthat view get information from the template and then view gives response to the users.
+django.shortcuts.render function combines a given template with a given context dictionary and returns an HttpResponse object with that rendered text.
+We write business login inside view.py and presentation inside template file(html). Still views.py will be responsible to process the template file that so we use render function.
+Function based view rendering template file syntax
+	from django.shortcuts import render
+	def function_name(request):
+		return render(request, '<template file>', context, content_type, status, using)
+	where,
+		request -> The HttpRequest object used to generate this response. 
+		<template file> -> Template file with path. If only file name provided then by default render search a folder named "templates" in every app and return the first found file
+		context -> Dictionary of values to add to the template context. By default this is an empty dictionary. If a value in the dictionary is callable, the view will call it just before rendering the template.
+		content_type -> The MIME type to use for the resulting document. Default to 'text/html'
+		status -> The status code for the response. Default to 200
+		using -> The NAME of a template engine to use for loading the template
+
+* Creating templates folder to store template file
+-> templates inside project vs templates inside app
+By default django.shortcuts.render search every app for a folder named "templates" and try match with provided template file name and if it is matched then the file is rendered using jinja2 render engine(which is embedded with django by default).
+App specific template file inside templates folder
+	$ mkdir <App Name>/templates
+	$ mkdir <App Name>/templates/<App Name>
+	$ touch <App Name>/templates/<App Name>/<File Name>.html
+
+App specific template file provides Plug&Play feature, but sometime we need to include some common feature all over the applications. To do so we need to create templates folder inside project and configure core.settings file.
+	$ pwd
+	  <project folder>
+	$ mkdir templates
+	
+	configure core.settings
+	TEMPLATES = [
+		{
+			...,
+			'DIRS' : [BASE_DIR / 'templates'],
+			...,
+		},
+	]
+
+* Dynamic Template Files using Dynamic Template Language(DTL)
+-> NEXT....
