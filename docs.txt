@@ -192,6 +192,8 @@ App specific template file provides Plug&Play feature, but sometime we need to i
 	$ mkdir templates
 	
 	configure core.settings
+	.
+	.
 	TEMPLATES = [
 		{
 			...,
@@ -199,6 +201,229 @@ App specific template file provides Plug&Play feature, but sometime we need to i
 			...,
 		},
 	]
+	.
+	.
 
 * Dynamic Template Files using Dynamic Template Language(DTL)
--> NEXT....
+-> django.shortcuts.render function uses jinja2 like(django's embedded engine) render engine to render html file with dynamic data provided.
+	TEMPLATES = [
+    		{
+        	    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+		    ...
+		    # if we want to use jinja2 then replace it with
+		    'BACKEND': 'django.template.backends.jinja2.Jinja2',
+
+		    # Before that install jinja2 to your virtual environment like this in your terminal
+		    #    $ pip install jinja2
+    		},
+	]
+Dynamic data can be passed to django.shortcuts.render function as context data which is a dictionary of (key, value) pairs. The keys are accessable to the html file using Dynamic Template Language. As django uses jinja2 engine language here is a some syntax of that language:
+
+
+Variables -> Variables look like this : {{<variable>}} When the template engine encounters a variable, it evaluates that variable(key) and replaces it with the result(value)
+	rules :
+		@ Variable names consists of any combination of alphanumeric characters and the underscore
+		@ Variable name should not start with underscore
+		@ Variable name can not have spaces or punctuation characters
+		@ Syntax : {{<variable>}}
+		@ Example :
+			{{name}}, {{description}}
+
+
+Filters -> When we need to modify variable before displaying we can filters. Pipe '|' is used to apply filter.
+		@ Syntax : {{<variable>|<filter>}}
+		@ Example :
+			{{name|upper}} -> all the character of name will be uppercase
+Some of filters take arguments.
+		@ Syntax : {{<variable>|<filter:argument>}}
+		@ Example :
+			{{article|truncatewords:40}}
+Filter can be chained.
+		@ Syntax : {{<variable>|filter1|filter2|...}}
+		@ Example :
+			{{article|upper|truncatewords:40}}
+Some common filter :
+capfirst -> It capitalizes the first chacter of the value. If the first character is not a letter, this filter has no effect
+	@ Example :
+		{{name|capfirst}}
+default -> If value evaluates to False, uses the given default. Otherwise, uses the value.
+	@ Example :
+		{{value|default:"nothing"}}
+length -> It returns the length of the value. This works for both strings and lists. The filter return 0 for an undefined variable
+	@ Example :
+		{{value|length}}
+lower -> It converts a string into all lowercase
+	@ Example :
+		{{value|lower}}
+upper -> It converts a string into all uppercase
+	@ Example :
+		{{value|upper}}
+slice -> It returns a slice of the list. Uses the same syntax as python's list slicing
+	@ Example :
+		{{some_list|slice:":2"}} -> show first two element
+truncatechars -> It truncates a string if it is longer than the specified number of characters. Truncated strings will end with a translatable ellipsis character("..."). Argument : Number of characters to truncate to
+	@ Example :
+		{{value|truncatechars:7}}
+truncatewords -> It truncates a string after a certain number of words. Newlines within the string will be removed. Argument : Number of words to truncate to
+	@ Example :
+		{{value|truncatewords:5}}
+date -> It formats a date according to the given format.
+	@ Example :
+		{{value|date:"D d M Y"}}
+time -> It formats a time according to the given format.
+	@ Example :
+		{{value|time:"H:i"}}
+
+	Format Character			Description					Example
+
+						Day
+
+	d			Day of the month, 2 digits with leadin zeros			01 to 31
+	j			Day of the month without leading zeros				1 to 31
+	D			Day of the week, textual, 3 letters				Fri
+	l			Day of the week, textual, long					Friday
+	S			English ordinal suffix for day of the month, 2 characters	st, nd, rd or th
+	w			Day of the week, digits without leading zeros			0(Sunday) to 6(Saterday)
+	z			Day of the year							1 to 366
+
+						Week
+
+	W			ISO-8601 week number of year, with weeks starting on monday	1, 53
+						Month
+	m			Month, 2 digits with leading zeros				01 to 12
+	n			Month without leading zero					1 to 12
+	M			Month, textual, 3 letters					Jan
+	b			Month, textual, 3 letters, lower				jan
+	E			Month, locale specific alternative representation
+				usually used for long date representation			"listopada" (for polish locale, as opposed to "Listopad")
+	F			Mont, textual, long						January
+	N			Month abbreviation in associated press style.
+				Proprietary extension						Jan, Feb, March, May
+	t			Number of days in the given month				28 to 31
+
+						Year
+
+	y			Year, 2 digits							99
+	Y			Year, 4 digits							1999
+	L			Boolean for wheter it's a leap year				True or False
+	o			ISO-8601 week-numbering year, corresponding to the
+				ISO-8601 week number(W) which uses leap weeks. See
+				Y for the more common year format				1999
+
+						Time
+
+	g			Hour, 12-hour format without leading zeros			1 to 12
+	G			Hour, 24-hour format without leading zeros			0 to 23
+	h			Hour, 12-hour format						01 to 12
+	H			Hour, 24-hour format						00 to 23
+	i			Minutes								00 to 59
+	s			Seconds, 2 digits with leadin zeros				00 to 59
+	u			Microseconds							000000 to 999999
+	a			"a.m" or "p.m"							a.m, p.m
+	A			"AM" or "PM"							AM, PM
+	f			Time, in 12-hours and minutes, with minutes left off
+				if they're zero. Proprietary extension				1, 1:30
+	P			Time, in 12-hour hours, minutes and "a.m" or "p.m",
+				with minutes left off if they're zero and the special-
+				case strings "midnight" or "noon" if appropriate. Pro-
+				pritary extension						1 a.m., 1:30 p.m., midnight, noon, 12:30 p.m.
+
+						Timezone
+
+	e			Timezone name. Could be in any format, or might return
+				an empty string, depending on the datetime			",'GMT','-500','US/Eastern',etc
+	I			Dayligth saving time, whether it's in effect or not		1 or 0
+	O			Differnce to greenwich time in hours				+0200
+	T			Timezone of this machine					EST, MDT
+	Z			Timezone offset in seconds. The offset for timezones
+				west of UTC is always negative, and for those cast of
+				UTC is always positive						-43200 to 43200
+
+						Date/Time
+
+	c			ISO 8601 format(Note: unlike others formatters, such
+				as "Z","O" or "r", the "c" formatter will not add
+				timezone offset if value is a naive datetime)			2008-01-02T10:30:00.000123+02, or 2008-01-02T10:30:00.000123 if the datetime is naive
+	r			RFC 5322 formatted date						'Thu, 21 Dec 2000 16:01:07 +0200'
+	U			Seconds since the Unix epoch(January 1 1970 00:00:00 UTC)	2374297397
+
+						Predefined formats
+
+	DATE_FORMAT		Default: 'N j, Y'						Feb. 9, 2020
+	DATETIME_FORMAT		Default: 'N j, Y, P'						Feb. 9, 2020, 10 p.m.
+	SHORT_DATE_FORMAT	Default: 'm/d/Y'						12/31/2020
+	SHORT_DATETIME_FORMAT	Default: 'm/d/Y P'						12/31/2020 4 p.m.
+	TIME_FORMAT		Default: 'H:i'							"01:24"
+
+	@ Example:
+		{{value|date:"SHORT_DATE_FORMAT"}}
+		{{value|time:"TIME_FORMAT"}}
+floatformat -> It format a floating point number to decimal place. Argument : 
+		if argument, n < 0 -> place n digit after floating point if needed
+		if argument, n = 0 -> rounds up to nearest number
+		if argument, n > 0 -> place n digit after floating point
+		if no argument is passed then place one digit after floating point if needed
+
+		@ Example :
+			{{number|floatformat}}
+			{{number|floatformat:-3}}
+			{{number|floatformat:0}}
+			{{number|floatformat:3}}
+
+
+Tags -> This is a way to write sudo python code to process and control data.
+	@ Syntax :
+		{% <tagname> %}
+			...
+			...
+		{% end<tagname> %}
+	@ Example :
+		{%if true%}
+			...
+		{%endif%}
+
+if tag -> The {%if%} tag evaluates a variable, if that variable is "true"(i.e. exists, is not empty, and is not false boolean value)
+	@ Syntax :
+		{% if <expression or value> %}
+			...
+		{% elif <expression or value> "%}
+			...
+		{% else %}
+			...
+		{% endif %}
+	we can use "and", "or", "not", "is", "==" operation within if tag
+	@ Example :
+		{% if name is "amous" %}
+                        ...
+                {% elif name is "souma"%}
+                        ...
+                {% else %}
+                        ...
+                {% endif %}
+
+Dot(.) lookup -> Technically, when the template system encounters a dot, it tries the following lookups, in this order :
+		1. Dictionary lookup
+		2. Attribute or method lookup
+		3. Numeric index lookup
+for tag -> the {%for%} tag is used for iterate over objects.
+	@ Syntax :
+		{% for <iterator> %}
+			...
+		{% empty %}
+			# work when the iterator is empty
+		{% endfor %}
+	@ Example :
+		{% for variable in variable %}
+			...
+		{% endfor %}
+				Predefined forloop varibles
+		   Variables					Description
+
+		forloop.counter					The current iteration of the loop (1-indexed)
+		forloop.counter0				The current iteration of the loop (0-indexed)
+		forloop.revcounter				The number of iterations from the end of the loop (1-indexed)
+		forloop.revcounter0				The number of iterations from the end of the loop (0-indexed)
+		forloop.first					True if this is the first time through the loop
+		forloop.last					True if this is the last time through th loop
+		forloop.parentloop				For nested loops, this is the loop surrounding the current one
+
