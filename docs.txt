@@ -371,7 +371,7 @@ floatformat -> It format a floating point number to decimal place. Argument :
 			{{number|floatformat:3}}
 
 
-Tags -> This is a way to write sudo python code to process and control data.
+Tags -> This is a way to write pseudo python code to process and control data.
 	@ Syntax :
 		{% <tagname> %}
 			...
@@ -426,4 +426,39 @@ for tag -> the {%for%} tag is used for iterate over objects.
 		forloop.first					True if this is the first time through the loop
 		forloop.last					True if this is the last time through th loop
 		forloop.parentloop				For nested loops, this is the loop surrounding the current one
+
+* Static Files
+-> CSS files, JavaScript files, Image files, Video files etc are considered as static files in Django. Django provides django.contrib.staticfiles to help you manage them. django.contrib.staticfiles collects static files from each of your applications (and any other places you specify) into a single location that can easily be served in production
+
+* Create static folder and files
+-> We create static folder inside root project folder then inside static folder we create required folders which will contain all static files respectively like css folder will contain all css file, image folder will contain all images and so on.
+configuration for static folder in core.setting
+	STATIC_DIR=BASE_DIR / 'static'
+	STATIC_URL='static'
+	STATICFILES_DIRS=[STATIC_DIR]
+where,
+STATIC_URL -> This is the URL to use when refering to static files located in STATIC_ROOT. It must end in a slash if set to a non-empty value
+STATIC_ROOT -> This is absolute path to the directory where collectstatic will collect static files for deployment. It is by default None
+STATICFILES_DIRS -> This setting defines the additional locations the "staticfiles" app will traverse if the FileSystemFinder finder is enable e.g if you use the collectstatic of findstatic management command or use the static file server view. It is by default an empty list.
+STATICFILES_STORAGE -> The file storage engine to use when collecting static files with the collectstatic management command.
+
+use static files in template files
+	@ Load static files
+		{% load static %} <!-- put it in the top -->
+	@ Reference static files
+		{% static <path of the file> %}
+* load template tag
+-> {% load <module_name> %} -> It loads a custom template tag set
+We can also selectively load individual filters or tags from a library or module, using the from argument like this
+	{% load <filters/tags name> from <module> %}
+* static template tag
+-> {% static filename %} -> It is used to link to static files that are saved in STATIC_ROOT. If the django.contrib.staticfiles app is installed, the tag will serve files using url() method of the storage specified by STATICFILES_STORAGE.
+we can also use alias static file name for used as variable
+	{% static <path of the file> as <variable name> %}
+* get_static_prefix template tag
+-> {% get_static_prefix %} -> We should prefer the static template tag, but if we need more control over exactly where and how STATIC_URL is injected into the template, we can use the get_static_prefix template tag. Basically it return the path of the root static folder. To load static file using get_static_prefix
+	{% get_static_prefix %}<path of the static file>
+	or
+	{% get_static_prefix as <any name> %}
+	{{<any name>}}<path of the static file>
 
