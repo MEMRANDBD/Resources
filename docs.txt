@@ -462,3 +462,92 @@ we can also use alias static file name for used as variable
 	{% get_static_prefix as <any name> %}
 	{{<any name>}}<path of the static file>
 
+* Template inheritance / Template extending
+-> Template inheritance allows you to build a base "skeleton" template that contains all the common elements of your site and defines blocks that child templates can override
+The {% extends %} tag tells the template engine that this template "extends" another template.
+When the template system evaluates this template, first it locates the parent <base html file>.
+At that point, the template engine will notice the block tags in base html and replace those blocks with the contents of the child template's blocks.
+You can use as many levels of inheritance as needed.
+* {% extends %} template tag
+-> The extends tag is used to inherit template. It tells the template engine that this template "extends" another template. It has no end tag.
+	@ Syntax :
+		{% extends <parent html file> %}
+* {% block %} template tag
+-> The block tag is used for overriding specific parts of a template.
+	@ Syntax :
+		{% block <block name> %}
+			...
+			...
+		{% endblock <block name> %} <!-- here block name is optional -->
+{{ block.super }} -> To get the parent's block elements
+* Rules regarding template inheritance
+-> # If we use {% extends %} in a template, it must be the first template tag in that template. Template inheritance won't work, otherwise.
+   # More {% block %} tags in our parent template are better.
+   # Child templates don't have to define all parent blocks, so we can fill in reasonable defaults in a number of blocks, then only define the ones we need later.
+   # We can't define multiple block tags with the same name in the same template.
+   # If we need to get the content of the block from the parent template, the {{ block.super }} variable will do the trick.
+We write common codes in parent template and create blocks for code which may vary page to page. Later this template will be inherited by child templates and child templates and child templates will override created block.
+
+A sample parent template skeleton with child template
+<!-- parent.html -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> {% block title %} PARENT {% endblock title %} </title>
+		{% block cssfiles %} PARENT CSS {% endblock cssfiles %}
+	</head>
+	<body>
+		{% block header %}
+			<h1> This header is from base(parent) template</h1>
+		{% endblock header %}
+		{% block bodycontent %}
+			<p> This paragraph is from base template</p>
+		{% endblock bodycontent %}
+		{% block footer %}
+			<p> This footer is from base template</p>
+		{% endblock footer %}
+		{% block jsfiles %} {% endblock jsfiles %}
+	</body>
+</html>
+
+<!-- child.html -->
+{% extends 'parent.html' %}
+{% block title %} CHILD {% endblock title %}
+{% block cssfiles %} OVERRIDEN CSS {% endblock cssfiles %}
+{% block header %}
+        <h1> This header is overriden from child template</h1>
+{% endblock header %}
+{% block bodycontent %}
+        <p> This paragraph is overriden from child template</p>
+{% endblock bodycontent %}
+{% block footer %}
+        <p> This footer is overriden from child template</p>
+{% endblock footer %}
+{% block jsfiles %} {% endblock jsfiles %}
+
+Template inheritance helps to gain reusablity of code.
+
+* Creating hyperlinks
+-> Hyperlinks helps to nevigate one page to another page of an application. There is an option to hardcoded hyperlink using <a> tag attribute, but there is a drawback to modify all the same url when need to modify. Specially for the dynamic url.
+* {% url %} template tag
+-> It returns an absolute path reference (a URL without the domain name) matching a given view and optional parameters. Any special characters in the resulting path will be encoded using iri_to_uri()
+	@ Syntax :
+		{% url <url name> %}
+		{% url <url name> <arguments> %}
+where,
+<url name> -> In django.urls.path we pass a optional parameter as name. Which is used to perform URL reversing.
+<arguments> -> those are use to replace the variable of url name. like <int:id> id will be replace by the first argument.
+
+* {% include %} template tag
+-> It loads a template and renders it with the current context. This is a way "including" other templates within a template. Each include is a completely independent redering process.
+The template name can either be a variable or a hard-coded (quoted)string, in either single or double quotes.
+	@ Syntax :
+		{% include <template file> %}
+We can pass additional context explicitly to the template using with keyword.
+	@ Syntax :
+		{% include <template file> with <key> = <value> %}
+If we want to render the context only with the variable provided(or even no variables at all), use the only option. No other variables are available to the included template.
+	@ Syntax :
+		{% include <template file> with <key> = <value> only %}
+We can use all context variable inside included template. only cascade this behaviour.
+
