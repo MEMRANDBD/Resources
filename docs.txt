@@ -551,3 +551,80 @@ If we want to render the context only with the variable provided(or even no vari
 		{% include <template file> with <key> = <value> only %}
 We can use all context variable inside included template. only cascade this behaviour.
 
+* Cookies and how it works
+-> A cookie is small piece of text data set by web server that resided on the client's machine. Once it's been set, the client automatically returns the cookie to the web server with each request that it makers. This allows the server to place value it wishes to 'remember' in the cookie and have access to them when creating a response.
+There two types of cookies:
+	1. Session cookies : Cookies that are set without the expires field are called session cookies. It is destroyed when the user quits the browser.
+	2. Persistent cookies : The browser keeps it up until their expiration date is reached.
+
+# An analogy with pros and cons
+When we take some action(Like : search, visit, click) in a website the web-server store that action in (key, value) pair and show it again when we again visit the website.
+Pros :
+	@ Can be create recommandation system
+	@ Can be create personal interest profile
+	@ Enhancing user experience
+Cons :
+	@ User data can be exposed to other website
+	@ Use user's computer resources
+	@ Misuse of user data by the website
+
+* Object Relational Mapper (ORM)
+-> It enables application to interact with database such as SQLite, MySQL, PostgreSQL, Oracle.
+ORMs automatically create a database schema from defined classes or models. It generate SQL from Python code for a particular database which means developer do not need to write SQL code.
+ORM maps objects attributes to respective table fields.
+It is easier to change the database if we use ORMs hence project becomes more portable.
+Django's ORM is just a way to create SQL to query and manipulate your database and get results in a pythonic fashion.
+ORMs use connectors to connect databases with a web application.
+
+* QuerySet
+-> A QuerySet can be defined as a list containing all those objects we have created using the Django model.
+QuerySets allow us to read the data from the database, filter it and order it in object oriented manner.
+
+* Model
+-> A Model is the single, definitive source of information about your data. It contains the essential fields and behaviours of the data you're storing. Generally, each model maps to a single database table
+# Model class
+It is class which will represent a table in database.
+Each model is a python class that subclasse of django.db.models.Model
+Each attribute of the model represents a database field.
+With all of this, Django gives you an automatically-generated database-access API
+Django provides built-in database by default that is sqlite database.
+We can use other database like MySQL, Oracle SQL etc
+
+* Creating model
+-> models.py file which is inside an application is required to create model class.
+Every model class inherit django.db.models.Model class. Basic structure of model class :
+	from django.db import models
+	class <DatabaseTableName>(models.Model) :
+		<field name> = models.<field type>
+
+# This class will create a table named <app name>_<DatabaseTableName> with columns named <field name>(if not specified) and their data types <field type>
+# As we have not mentioned primary key in any of these columns so it will automatically create a new column named 'id' Data type Integer with primary key and auto increment.
+
+* Rules regarding model
+-> # Field name instantiated as a class attribute and represents a particular table's Column name.
+   # Field type is also known as Data Type
+   # A field name cannot be a python reserved word, because that would result in a python syntax error.
+   # A field name cannot contain more than one underscore in a row, due to the way Django's query lookup syntax works.
+   # A field name cannot end with an underscore.
+
+* Migrations
+-> Migrations are Django's way of propagating changed you make to your models (adding a field, deleting a model, etc) into your database schema.
+# makemigrations -> This is responsible for creating new migrations based on the changes you have made to your models.
+# migrate -> This is responsible for applying and unapplying migrations
+# sqlmigrate -> This displays the SQL statements for a migration
+# showmigrations -> This lists a project's migrations and their status
+
+In past we saw how to add an application in INSTALLED_APPS. This cause the activation of an application. The model class create a abstract layer for all kinds of database management system(MySQL, sqlite, PostgreSQL). This model class then translated to executable sql commands. To do so,
+	$ python manage.py makemigrations  # This create a python file inside migrations directory
+To see the sql code that Django will execute in the database system to create the table for model :
+	$ python manage.py sqlmigrate <app name> <migration number>
+To execute sql code for database system :
+	$ python manage.py migrate
+The django.contrib.admin application is already included in the INSTALLED_APPS setting for administrative purpose. To create admin :
+	$ python manage.py createsuperuser
+	> Username (leave blank to use 'admin'): admin
+	> Email address: admin@admin.com
+	> Password: ********
+	> Password (again): ********
+	> Superuser created successfully.
+What is initial in migration file -> The 'initial migration'
