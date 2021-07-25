@@ -627,4 +627,24 @@ The django.contrib.admin application is already included in the INSTALLED_APPS s
 	> Password: ********
 	> Password (again): ********
 	> Superuser created successfully.
-What is initial in migration file -> The 'initial migration'
+What is initial in migration file -> The 'initial migration' for an app are the migrations that create the first version of that app's tables. Usually an app will have one initial migration, but in some cases of complex model interdependencies it may have two or more.
+Initial migrations are marked with an initial=True class attribute on the migration class. If an initial class attribute isn't found, a migration will be considered "initial" if it is the first migration in the app.
+What is dependencies -> A list of migrations this one depends on
+What is operations -> A list of operation classes that define what this migration does
+
+* Built-in Field options
+-> # null -> it can contain either True or False. If True, Django will store empty value as NULL in the database. Default is False. Avoid using null on string-based fields such as CharField and TextField. If a string-based field has null=True, that means it has possible value for "no data": NULL, and the empty string.
+	@ Example :
+		null=True
+   # blank -> It can contain either True or False. If True, the field is allowed to be blank. This is different than null, null is purely database-related, whereas blank is validation-related. If a field has blank=True, form validation will allow entry of an empty value. If a field has blank=False, the field will be required. Default if False.
+   	@ Example :
+		blank=True
+   # default -> The default value for the field. This can be a value or a callable object. If callable it will be called every time a new object is created.
+   	@ Example :
+		default="Not Available"
+   # verbose_name -> A human-readable name for the field. If the verbose name isn't given, Django will automatically create it using the field's attribute name, converting underscores to spaces.
+   	@ Example :
+		verbose_name="Student Name"
+   # db_column -> The name of the database column to use for the field. If this isn't given,Django will use the field's name.
+   	@ Example :
+		db_column="Student Name"
